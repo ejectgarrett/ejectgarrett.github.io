@@ -43,7 +43,7 @@ int main () {
 
         BeginMode2D(camera);
         DrawTexture(dvd, 0, 0, WHITE);
-        EndMode2D(camera);
+        EndMode2D();
 
         ClearBackground(BLACK);
         EndDrawing();
