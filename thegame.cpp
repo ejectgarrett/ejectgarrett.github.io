@@ -8,7 +8,6 @@ int main () {
 
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
-    int targetFPS = 60;
     int dvd_speed_x = 5;
     int dvd_speed_y = 5;
 
