@@ -14,7 +14,8 @@ int main () {
     int dvd_y = 100;
     int dvd_speed_x = 5;
     int dvd_speed_y = 5;
-    int dvd_radius = 200;
+    int dvd_width = 184;
+    int dvd_height = 76;
     cout << "Hello World" << endl;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
@@ -27,12 +28,12 @@ int main () {
         dvd_x += dvd_speed_x;
         dvd_y += dvd_speed_y;
 
-        if (dvd_x + dvd_radius >= SCREEN_WIDTH || dvd_x - dvd_radius <= 0)
+        if (dvd_x + dvd_width >= SCREEN_WIDTH || dvd_x - dvd_width <= 0)
         {
             dvd_speed_x *= -1;
         }
 
-        if (dvd_y + dvd_radius >= SCREEN_HEIGHT || dvd_y - dvd_radius <= 0)
+        if (dvd_y + dvd_height >= SCREEN_HEIGHT || dvd_y - dvd_height <= 0)
         {
             dvd_speed_y *= -1;
         }
