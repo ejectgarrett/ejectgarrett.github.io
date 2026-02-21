@@ -23,22 +23,20 @@ int main () {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
     Texture2D markTex = LoadTextureFromImage(mark);
     UnloadImage(mark);
-    SetTargetFPS(60);
+    SetTargetFPS(GetMonitorRefreshRate(0));
     while (!WindowShouldClose()) {
    
-        mark_x += mark_speed_x;
-        mark_y += mark_speed_y;
+        if (IsKeyDown(KEY_RIGHT) && mark_x < SCREEN_WIDTH - mark_width)
+            mark_x += mark_speed_x;
 
-        if (mark_x + mark_width >= SCREEN_WIDTH || mark_x <= 0)
-        {
-            mark_speed_x *= -1;
-        }
+        if (IsKeyDown(KEY_LEFT) && mark_x > mark_speed_x)
+            mark_x -= mark_speed_x;
 
-        if (mark_y + mark_height >= SCREEN_HEIGHT || mark_y <= 0)
-        {
-            mark_speed_y *= -1;
-        }
+        if (IsKeyDown(KEY_UP) && mark_y > mark_speed_y)
+            mark_y -= mark_speed_y;
 
+        if (IsKeyDown(KEY_DOWN) && mark_y < SCREEN_HEIGHT - mark_height)
+            mark_y += mark_speed_y;
         
         BeginDrawing();
         ClearBackground(BLACK);
