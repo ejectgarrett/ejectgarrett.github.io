@@ -23,25 +23,29 @@ int main () {
     int color = 0;
     Color colors[6] = {RED, ORANGE, YELLOW, GREEN, BLUE, MAGENTA};
     Texture2D dvd = LoadTexture("dvd.png");
+    Camera2D camera;
+    camera.offset.x = SCREEN_WIDTH / 2;
+    camera.offset.y = SCREEN_HEIGHT / 2;
+    camera.target.x = 0;
+    camera.target.y = 0;
+    camera.zoom = 1;
+
+    Vector2 player_position;
+    player_position.x = 0;
+    player_position.y = 0;
+
     while (!WindowShouldClose()) {
+        // upd camera
+        camera.target.x = player_position.x;
+        camera.target.y = player_position.y;
    
-        dvd_x += dvd_speed_x;
-        dvd_y += dvd_speed_y;
-
-        if (dvd_x + dvd_width >= SCREEN_WIDTH || dvd_x <= 0)
-        {
-            dvd_speed_x *= -1;
-        }
-
-        if (dvd_y + dvd_height >= SCREEN_HEIGHT || dvd_y <= 0)
-        {
-            dvd_speed_y *= -1;
-        }
-
-        
         BeginDrawing();
+
+        BeginMode2D(camera);
+        DrawTexture(dvd, 0, 0, WHITE);
+        EndMode2D(camera);
+
         ClearBackground(BLACK);
-        DrawTexture(dvd, dvd_x,dvd_y, WHITE);
         EndDrawing();
     }
     UnloadTexture(dvd);
