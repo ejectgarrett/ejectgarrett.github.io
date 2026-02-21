@@ -5,19 +5,20 @@ using namespace std;
 
 int main () {
 
-    const int SCREEN_WIDTH = 800;
-    const int SCREEN_HEIGHT = 600;
+    const int SCREEN_WIDTH = GetMonitorWidth(0);
+    const int SCREEN_HEIGHT = GetMonitorHeight(0);
+    ToggleFullscreen();
+    int targetFPS = GetMonitorRefreshRate(0);
     int ball_x = 100;
     int ball_y = 100;
     int ball_speed_x = 5;
     int ball_speed_y = 5;
     int ball_radius = 15;
-
     cout << "Hello World" << endl;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
-    SetTargetFPS(60);
-
+    SetTargetFPS(165);
+    bool color = false;
     while (WindowShouldClose() == false){
    
         ball_x += ball_speed_x;
@@ -35,6 +36,11 @@ int main () {
         
         BeginDrawing();
             ClearBackground(BLACK);
+        if (IsKeyPressed(KEY_H))
+            color = !color;
+        if (color)
+            DrawCircle(ball_x,ball_y,ball_radius, BLUE);
+        else
             DrawCircle(ball_x,ball_y,ball_radius, WHITE);
         EndDrawing();
     }
