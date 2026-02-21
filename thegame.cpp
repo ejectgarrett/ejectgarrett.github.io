@@ -28,12 +28,12 @@ int main () {
         dvd_x += dvd_speed_x;
         dvd_y += dvd_speed_y;
 
-        if (dvd_x + dvd_width >= SCREEN_WIDTH || dvd_x - dvd_width <= 0)
+        if (dvd_x + dvd_width >= SCREEN_WIDTH || dvd_x <= 0)
         {
             dvd_speed_x *= -1;
         }
 
-        if (dvd_y + dvd_height >= SCREEN_HEIGHT || dvd_y - dvd_height <= 0)
+        if (dvd_y + dvd_height >= SCREEN_HEIGHT || dvd_y <= 0)
         {
             dvd_speed_y *= -1;
         }
