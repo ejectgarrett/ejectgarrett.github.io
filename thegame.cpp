@@ -7,7 +7,6 @@ int main () {
 
     const int SCREEN_WIDTH = GetMonitorWidth(0);
     const int SCREEN_HEIGHT = GetMonitorHeight(0);
-    ToggleFullscreen();
     int targetFPS = GetMonitorRefreshRate(0);
     int ball_x = 100;
     int ball_y = 100;
@@ -17,7 +16,8 @@ int main () {
     cout << "Hello World" << endl;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
-    SetTargetFPS(165);
+    SetTargetFPS(targetFPS);
+    ToggleFullscreen();
     bool color = false;
     while (WindowShouldClose() == false){
    
