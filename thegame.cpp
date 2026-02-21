@@ -7,7 +7,7 @@ int main () {
 
     const int SCREEN_WIDTH = GetMonitorWidth(0);
     const int SCREEN_HEIGHT = GetMonitorHeight(0);
-    int targetFPS = GetMonitorRefreshRate(0);
+    int targetFPS = 165;
     int ball_x = 100;
     int ball_y = 100;
     int ball_speed_x = 5;
@@ -17,7 +17,7 @@ int main () {
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
     SetTargetFPS(targetFPS);
-    ToggleFullscreen();
+    //ToggleFullscreen();
     bool color = false;
     while (WindowShouldClose() == false){
    
@@ -41,7 +41,7 @@ int main () {
         if (color)
             DrawCircle(ball_x,ball_y,ball_radius, BLUE);
         else
-            DrawCircle(ball_x,ball_y,ball_radius, WHITE);
+            DrawCircle(ball_x,ball_y,ball_radius, RED);
         EndDrawing();
     }
 
