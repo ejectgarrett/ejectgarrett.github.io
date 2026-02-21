@@ -12,10 +12,10 @@ int main () {
     int dvd_speed_x = 5;
     int dvd_speed_y = 5;
 
-    Image mark = LoadImage("mark.png");
-    Texture2D markTex = LoadTexture("dvd.png");
+    Texture mark = LoadTexture("mark.png");
     int dvd_width = mark.width;
     int dvd_height = mark.height;
+    cout << "MarkTex Height:" << mark.height << endl;
     int dvd_x = dvd_width * 1.25;
     int dvd_y = dvd_height * 1.25;
     cout << "Hello World" << endl;
@@ -40,11 +40,10 @@ int main () {
         
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTexture(markTex, dvd_x,dvd_y, WHITE);
+        DrawTexture(mark, dvd_x,dvd_y, WHITE);
         EndDrawing();
     }
     
-    UnloadTexture(markTex);
-    UnloadImage(mark);
+    UnloadTexture(mark);
     CloseWindow();
 }
