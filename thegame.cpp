@@ -8,40 +8,41 @@ int main () {
 
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
-    int dvd_speed_x = 5;
-    int dvd_speed_y = 5;
+    int mark_speed_x = 5;
+    int mark_speed_y = 5;
 
     Image mark = LoadImage("mark.png");
-    Texture2D markTex = LoadTextureFromImage(mark);
-    UnloadImage(mark);
-    int dvd_width = 50;
-    int dvd_height = 50;
-    cout << "MarkTex Height:" << markTex.height << endl;
-    int dvd_x = dvd_width * 1.25;
-    int dvd_y = dvd_height * 1.25;
+    ImageResize(&mark, mark.width * 0.5, mark.height * 0.5);
+    int mark_width = mark.width;
+    int mark_height = mark.height;
+    cout << "MarkTex Height:" << mark.height << endl;
+    int mark_x = mark_width;
+    int mark_y = 1;
     cout << "Hello World" << endl;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
+    Texture2D markTex = LoadTextureFromImage(mark);
+    UnloadImage(mark);
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
    
-        dvd_x += dvd_speed_x;
-        dvd_y += dvd_speed_y;
+        mark_x += mark_speed_x;
+        mark_y += mark_speed_y;
 
-        if (dvd_x + dvd_width >= SCREEN_WIDTH || dvd_x <= 0)
+        if (mark_x + mark_width >= SCREEN_WIDTH || mark_x <= 0)
         {
-            dvd_speed_x *= -1;
+            mark_speed_x *= -1;
         }
 
-        if (dvd_y + dvd_height >= SCREEN_HEIGHT || dvd_y <= 0)
+        if (mark_y + mark_height >= SCREEN_HEIGHT || mark_y <= 0)
         {
-            dvd_speed_y *= -1;
+            mark_speed_y *= -1;
         }
 
         
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTexture(markTex, dvd_x,dvd_y, WHITE);
+        DrawTexture(markTex, mark_x, mark_y, WHITE);
         EndDrawing();
     }
 
