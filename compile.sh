@@ -1,0 +1,1 @@
+g++ -Wall -Wextra -o thegame.exe thegame.cpp -I C:\raylib\raylib\src -L C:\raylib\raylib\libs\mingw64 -lraylib -lopengl32 -lgdi32 -lwinmm -lkernel32
