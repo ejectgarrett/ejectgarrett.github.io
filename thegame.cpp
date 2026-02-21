@@ -10,7 +10,7 @@ int main () {
     const int SCREEN_HEIGHT = 600;
     cout << "HEIGHT: " << SCREEN_HEIGHT  << "WIDTH: " << SCREEN_WIDTH << endl;
     int targetFPS = 60;
-    int dvd_x = 100;
+    int dvd_x = 200;
     int dvd_y = 100;
     int dvd_speed_x = 5;
     int dvd_speed_y = 5;
