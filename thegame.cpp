@@ -8,21 +8,20 @@ int main () {
 
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
-    cout << "HEIGHT: " << SCREEN_HEIGHT  << "WIDTH: " << SCREEN_WIDTH << endl;
     int targetFPS = 60;
-    int dvd_x = 200;
-    int dvd_y = 100;
     int dvd_speed_x = 5;
     int dvd_speed_y = 5;
-    int dvd_width = 184;
-    int dvd_height = 76;
+
+    Image mark = LoadImage("mark.png");
+    Texture2D markTex = LoadTexture("dvd.png");
+    int dvd_width = mark.width;
+    int dvd_height = mark.height;
+    int dvd_x = dvd_width * 1.25;
+    int dvd_y = dvd_height * 1.25;
     cout << "Hello World" << endl;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "My first RAYLIB program!");
     SetTargetFPS(60);
-    int color = 0;
-    Color colors[6] = {RED, ORANGE, YELLOW, GREEN, BLUE, MAGENTA};
-    Texture2D dvd = LoadTexture("dvd.png");
     while (!WindowShouldClose()) {
    
         dvd_x += dvd_speed_x;
@@ -41,9 +40,11 @@ int main () {
         
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTexture(dvd, dvd_x,dvd_y, WHITE);
+        DrawTexture(markTex, dvd_x,dvd_y, WHITE);
         EndDrawing();
     }
-    UnloadTexture(dvd);
+    
+    UnloadTexture(markTex);
+    UnloadImage(mark);
     CloseWindow();
 }
