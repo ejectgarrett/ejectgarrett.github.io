@@ -80,7 +80,6 @@ char *bad_lines[MAXIMUM_CODELINES / 2] = {
     "int x y = 3;",
     "int z = (a + 3));",
     "int n = sizeof int;",
-    "char *str = \"hello;",
     "int m = a *** 2;",
     "return = 5;",
     "int q = (int) ;",
@@ -88,7 +87,6 @@ char *bad_lines[MAXIMUM_CODELINES / 2] = {
     "int t = 5,;",
     "double u = 1e;",
     "int v = a + (b *);",
-    "goto 100;",
     "int w = 0xG1;"
 };
 
@@ -133,9 +131,7 @@ int main()
     dialogue_font = LoadFont("comicsans.ttf");
     Image mark_img = LoadImage("mark.png");
     Image redmark_img = LoadImage("redmark.png");
-    Image background = LoadImage("tile.png");
 
-    int scalar = SCREEN_WIDTH / 10;
     ImageResize(&mark_img, SCREEN_WIDTH / 10, SCREEN_WIDTH / 10 * ((float)mark_img.height / (float)mark_img.width));
     ImageResize(&redmark_img, SCREEN_WIDTH / 10, SCREEN_WIDTH / 10 * ((float)mark_img.height / (float)mark_img.width));
     Texture2D markTex = LoadTextureFromImage(mark_img);
@@ -158,7 +154,6 @@ int main()
     SetTargetFPS(GetMonitorRefreshRate(0));
     int i = 0;
 
-    Vector2 text_origin = {0.5, 0};
     float time_since_last = 0;
     float animated_height = 0;
     
@@ -203,6 +198,7 @@ int main()
             (Rectangle) {
                 SCREEN_WIDTH - SCREEN_WIDTH / 24, 0, CONTROLS_SIZE, CONTROLS_SIZE
             }, (Vector2) {CONTROLS_SIZE, 0}, 0, RAYWHITE);
+        DrawDialogue(i, time_since_last);
         DrawMark(false);
         if (IsKeyPressed(KEY_ENTER)) {
             i++;
@@ -216,7 +212,6 @@ int main()
             GameLoop();
             break;
         }
-        DrawDialogue(i, time_since_last);
         EndDrawing();
     }
 
@@ -312,9 +307,8 @@ void DrawDialogue(int i, float time_since_last)
     //     cos(7 * time_since_last);
     float animated_y = Clamp(1 - 0.5 * time_since_last, 0, 100) * 
         cos(4 * time_since_last);
-    animated_y = abs(animated_y);
+    animated_y = fabs(animated_y);
 
-    //MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
     float text_width = MeasureTextEx(dialogue_font, lines[i], animated_font_size, 0).x;
 
     DrawTextPro(dialogue_font, lines[i], 
@@ -347,7 +341,9 @@ void GameLoop()
     Sound pickup_good = LoadSound("pickupgood.mp3");
     Sound pickup_bad = LoadSound("pickupbad.mp3");
     Texture2D objectiveTex = LoadTexture("objective.png");
-    const char *game_message = "Defend Mark from the invalid syntaxes!\n     Be sure to pick up the valid syntax\n         Don't let his health go NULL.";
+
+    float game_time = GetTime();
+
     while (!WindowShouldClose())
     {
         TakeMovementInput();
@@ -365,10 +361,7 @@ void GameLoop()
             break;
         }
 
-        if (GetTime() < 30) 
-            // DrawTextEx(*font, game_message, 
-            // (Vector2) {SCREEN_WIDTH / 2 - (MeasureText(game_message, SMALL_FONT) / 2),
-            // SCREEN_HEIGHT / 16}, SMALL_FONT, 0, BLACK);
+        if (GetTime() - game_time < 25) 
             DrawTexturePro(objectiveTex, 
                 (Rectangle) {0, 0, objectiveTex.width, objectiveTex.height},
                 (Rectangle) {
@@ -404,7 +397,7 @@ void InitCodelines(CodeLine *codelines[])
         srand(time(NULL) + i);
         
         codelines[i]->line = good_lines[i];
-        codelines[i]->width = MeasureTextEx(code_font, codelines[i]->line, 30, 0).x;
+        codelines[i]->width = MeasureTextEx(code_font, codelines[i]->line, SMALL_FONT, 0).x;
         codelines[i]->x = GetRandomValue(-1 * MAXIMUM_CODELINES / 2 * SCREEN_WIDTH, 0);
         codelines[i]->y = GetRandomValue(SCREEN_HEIGHT / 8, 7 * SCREEN_HEIGHT / 8);
         codelines[i]->active = true;
@@ -415,7 +408,7 @@ void InitCodelines(CodeLine *codelines[])
         srand(time(NULL) + i);
 
         codelines[i]->line = bad_lines[i - (MAXIMUM_CODELINES / 2)];
-        codelines[i]->width = MeasureTextEx(code_font, codelines[i]->line, 30, 0).x;
+        codelines[i]->width = MeasureTextEx(code_font, codelines[i]->line, SMALL_FONT, 0).x;
         codelines[i]->x = GetRandomValue(-1 * MAXIMUM_CODELINES / 2 * SCREEN_WIDTH, 0);
         codelines[i]->y = GetRandomValue(0, SCREEN_HEIGHT - 30);
         codelines[i]->active = true;
@@ -451,11 +444,7 @@ void DrawCodeLine(CodeLine *codeline, Sound *good, Sound *bad)
         NUM_ACTIVE--;
         return;
     }
-    BoundingBox codeline_bounds;
-    // codeline_bounds.min = (Vector3){codeline->x - 6, codeline->y, -100};
-    // codeline_bounds.max = (Vector3){codeline->x + codeline->width + 6, codeline->y + 30, 100};
-    // bool collision = CheckCollisionBoxSphere(codeline_bounds, 
-    //     (Vector3){marks.x, marks.y, 0}, marks.a)
+
     bool collision = CheckCollisionRecs(
         (Rectangle) {codeline->x - 6, codeline->y, codeline->width + 12, SMALL_FONT}, 
         (Rectangle) {marks.x - marks.b->width / 2, marks.y - marks.b->height / 2, marks.b->width, marks.b->height});
