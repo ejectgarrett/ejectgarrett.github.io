@@ -11,10 +11,10 @@
 3. If on Linux (and maybe MacOS), run `compilelinux.sh`
 
 # Acknowledgments
-1. Generative AI has not been used for programming purposes but was used to generate some of the "code line" enemies 
+Generative AI has not been used for programming purposes but was used to generate some of the "code line" enemies 
 
 # Credits
 * Elias Seidman
 * Jesse Li
 * Elijah Greenberg
-* Mark Sheldon (kinda)
+* Mark Sheldon (likeness)
