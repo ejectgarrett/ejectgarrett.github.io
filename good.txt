@@ -1,0 +1,7 @@
+int i = 5;
+if (5 < 7) { printf("splendid"); }
+string goobert = "goobert";
+int bread = 2;
+char f = 'c';
+int _string = 60;
+int gooberts_money = 5;

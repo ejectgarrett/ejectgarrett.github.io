@@ -1,0 +1,201 @@
+[gd_scene load_steps=19 format=3 uid="uid://bj30ylx5nka08"]
+
+[ext_resource type="Script" uid="uid://dlwip40y57fit" path="res://SceneManager.gd" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://bf3yxs6l84g1g" path="res://PlayerController.gd" id="1_ig7tw"]
+[ext_resource type="Material" uid="uid://dgssatqkvr7ou" path="res://interact_highlight.tres" id="3_h2yge"]
+[ext_resource type="Script" uid="uid://2582lneqco31" path="res://ItemBox.gd" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://cw6dig8j05le6" path="res://ClickableBody.gd" id="4_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://c1vjrpl15bb07" path="res://textures/inventory_slot.png" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://ctvnkogkxsxyo" path="res://PlatingController.gd" id="6_272bh"]
+[ext_resource type="Texture2D" uid="uid://l1b72bvt2fos" path="res://textures/plate.png" id="7_5vw27"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_h2yge"]
+sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
+
+[sub_resource type="Environment" id="Environment_1bvp3"]
+background_mode = 2
+sky = SubResource("Sky_h2yge")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7dm0k"]
+size = Vector2(100, 100)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_7dm0k"]
+data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_7dm0k"]
+radial_segments = 8
+rings = 2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ig7tw"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ig7tw"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_7mycd"]
+font_color = Color(0, 0, 0, 1)
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_0xm2m")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1bvp3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_7dm0k")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_7dm0k")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+script = ExtResource("1_ig7tw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_7dm0k")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_ig7tw")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 5.5, 4)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -4)
+mesh = SubResource("BoxMesh_ig7tw")
+script = ExtResource("3_lquwl")
+item_id = "balls"
+
+[node name="dawg" type="StaticBody3D" parent="MeshInstance3D2" node_paths=PackedStringArray("attached_body")]
+script = ExtResource("4_1bvp3")
+attached_body = NodePath("..")
+_material_overlay = ExtResource("3_h2yge")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D2/dawg"]
+shape = SubResource("ConcavePolygonShape3D_ig7tw")
+
+[node name="Control" type="Control" parent="."]
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -300.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Plating" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_272bh")
+
+[node name="Plate" type="TextureRect" parent="Control/Plating"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -512.0
+offset_top = -256.0
+offset_right = 512.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset = Vector2(512, 128)
+mouse_filter = 0
+texture = ExtResource("7_5vw27")
+
+[node name="HeldIngredient" type="TextureRect" parent="Control/Plating/Plate"]
+layout_mode = 0
+offset_top = -670.0
+offset_right = 40.0
+offset_bottom = -630.0
+
+[node name="Inventory" type="HBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 328.0
+offset_bottom = 136.0
+
+[node name="Slot0" type="TextureButton" parent="Control/Inventory"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("6_7mycd")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Control/Inventory/Slot0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = SubResource("LabelSettings_7mycd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="TextureButton" parent="Control/Inventory"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("6_7mycd")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Control/Inventory/Slot1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = SubResource("LabelSettings_7mycd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="TextureButton" parent="Control/Inventory"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("6_7mycd")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Control/Inventory/Slot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = SubResource("LabelSettings_7mycd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="clicked" from="MeshInstance3D2/dawg" to="MeshInstance3D2" method="take"]
