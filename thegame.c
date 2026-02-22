@@ -5,13 +5,14 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAXIMUM_CODELINES 15
 
 typedef struct {Texture2D *a, *b; int x, y, health; float x_multiplier, y_multiplier;} Marks;
-typedef struct {char *line; int size, x, y; bool good;} CodeLine;
+typedef struct {char *line;/* Pixel length */ int width, x, y; bool good;} CodeLine;
 
 const char *lines[5] = {
     "Welcome my friend!", 
@@ -44,9 +45,9 @@ void TakeMovementInput(Marks *marks, float delta);
 float Clamp(float v, float _min, float _max);
 float Lerp(float a, float b, float interp);
 void InitCodelines(CodeLine *codelines[]);
-void UpdateCodeLines(CodeLine *codelines, float delta);
+void UpdateCodeLines(Marks *marks, CodeLine *codelines[], float delta, Sound *good, Sound *bad);
 void SpawnCodeLine(CodeLine *codelines);
-void DrawCodeLine(Marks *marks, CodeLine *codeline);
+void DrawCodeLine(Marks *marks, CodeLine *codeline, Sound *good, Sound *bad);
 void DrawMark(Marks *marks, bool red);
 void DrawDialogue(Font *font, int i, Marks *marks, float time_since_last);
 void GameLoop(Marks *marks, Font *font);
@@ -59,8 +60,8 @@ Color DROP_SHADOW = (Color) {0, 0, 0, 100};
 int SCREEN_WIDTH;
 int SCREEN_HEIGHT;
 
-int MARK_SPEED = 8;
-
+#define MARK_SPEED 8
+#define CODELINE_SPEED 7
 
 int main() 
 {
@@ -70,7 +71,6 @@ int main()
     SCREEN_HEIGHT = GetScreenHeight();
     ToggleBorderlessWindowed();
     HideCursor();
-    printf("Width: %d, Height: %d\n", SCREEN_WIDTH, SCREEN_HEIGHT);
     Font comicsans = LoadFont("comicsans.ttf");
     Image mark = LoadImage("mark.png");
     Image redmark = LoadImage("redmark.png");
@@ -186,27 +186,38 @@ void TakeMovementInput(Marks *marks, float delta)
 }
 
 float mark_rotation = 0;
+Color mark_color = RAYWHITE;
+float mark_scale = 1;
 void DrawMark(Marks *marks, bool red) 
 {
     Texture2D *curr_mark; 
     if (red)
         curr_mark = marks->b;
     else
-        curr_mark = marks->a;
+
+
+            curr_mark = marks->a;
     
     Rectangle source = {0, 0, marks->a->width, marks->a->height};
     Rectangle destination = {marks->x, marks->y, marks->a->width, curr_mark->height};
     Rectangle shadow_destination = {marks->x + 15, marks->y + 15, marks->a->width, 
         curr_mark->height};
-
+    
     mark_rotation = Lerp(mark_rotation, marks->x_multiplier * 5, 0.12f);
+    mark_scale = Lerp(mark_scale, 1, 0.1);
+    mark_color = (Color){
+        Lerp(mark_color.r, RAYWHITE.r, 0.1),
+        Lerp(mark_color.g, RAYWHITE.g, 0.1),
+        Lerp(mark_color.b, RAYWHITE.b, 0.1),
+        Lerp(mark_color.a, RAYWHITE.a, 0.1)
+    };
 
     // draw shadow
     DrawTexturePro(*curr_mark, source, shadow_destination, 
         (Vector2) {curr_mark->width / 2, curr_mark->height / 2}, mark_rotation, DROP_SHADOW);
     // draw mark
     DrawTexturePro(*curr_mark, source, destination, 
-        (Vector2) {curr_mark->width / 2, curr_mark->height / 2}, mark_rotation, RAYWHITE);
+        (Vector2) {curr_mark->width / 2, curr_mark->height / 2}, mark_rotation, mark_color);
 }
 //Marks *marks
 //Font *font, int i, int mark_x, int mark_y, int mark_width, int mark_height, float time_since_last
@@ -240,9 +251,12 @@ void GameLoop(Marks *marks, Font *font)
     for (int i = 0; i < MAXIMUM_CODELINES; i++) {
         codelines[i] = (CodeLine *)malloc(sizeof(CodeLine));
     }
+
     InitCodelines(codelines);
     Music music_track = LoadMusicStream("music.mp3");
     PlayMusicStream(music_track);
+    Sound pickup_good = LoadSound("pickupgood.mp3");
+    Sound pickup_bad = LoadSound("pickupbad.mp3");
     const char *game_message = "Defend Mark from the invalid syntaxes!\n         Don't let his health go NULL.";
     while (!WindowShouldClose())
     {
@@ -253,17 +267,17 @@ void GameLoop(Marks *marks, Font *font)
         UpdateMusicStream(music_track);
         BeginDrawing();
         ClearBackground(RAYWHITE);
+
+        UpdateCodeLines(marks, codelines, delta, &pickup_good, &pickup_bad);
         DrawMark(marks, true);
 
-        if (marks->health <0 -1)
-        {
+        if (marks->health < 0) {
             EndDrawing();
             YouLose(font);
             break;
         }
 
-        if (GetTime() < 40)
-        {
+        if (GetTime() < 40) {
             DrawTextEx(*font, game_message, 
             (Vector2) {SCREEN_WIDTH / 2 - (MeasureText(game_message, 30) / 2),
             SCREEN_HEIGHT / 20}, 30, 0, BLACK);
@@ -273,9 +287,8 @@ void GameLoop(Marks *marks, Font *font)
             DrawTextEx(*font, TextFormat("HEALTH = %d", marks->health), 
             (Vector2) {SCREEN_WIDTH - SCREEN_WIDTH / 8, 
             SCREEN_HEIGHT / 20}, 40, 0, BLACK);
-            
 
-        if (GetTime() >= 70)
+        if (GetTime() >= 70) // Should be 70
         {
             EndDrawing();
             YouWin(font);
@@ -284,56 +297,89 @@ void GameLoop(Marks *marks, Font *font)
 
         EndDrawing();
     }
+
+    for (int i = 0; i < MAXIMUM_CODELINES; i++)
+        free(codelines[i]);
     StopMusicStream(music_track);
     UnloadMusicStream(music_track);
 
 }
-int CODELINE_SPEED = 7;
 
 void InitCodelines(CodeLine *codelines[])
 {
     for (int i = 0; i < MAXIMUM_CODELINES / 2; i++) {
-        printf("%s\n", good_lines[i]);
+        srand(time(NULL) + i);
+        
         codelines[i]->line = good_lines[i];
-        codelines[i]->size = strlen(good_lines[i]);
-        codelines[i]->x = 0;
-        codelines[i]->y = 0;
+        codelines[i]->width = MeasureTextEx(GetFontDefault(), codelines[i]->line, 30, 0).x;
+        codelines[i]->x = GetRandomValue(-5 * SCREEN_WIDTH, 0);
+        codelines[i]->y = GetRandomValue(0, SCREEN_HEIGHT);
+        //rand() * SCREEN_HEIGHT
         codelines[i]->good = true;
-        printf("%s\n", good_lines[i]);
     }
 
     for (int i = MAXIMUM_CODELINES / 2; i < MAXIMUM_CODELINES - 1; i++) {
+        srand(time(NULL) + i);
+
         codelines[i]->line = bad_lines[i - (MAXIMUM_CODELINES / 2)];
-        codelines[i]->size = strlen(bad_lines[i - (MAXIMUM_CODELINES / 2)]);
-        codelines[i]->x = 0;
-        codelines[i]->y = 0;
+        codelines[i]->width = MeasureTextEx(GetFontDefault(), codelines[i]->line, 30, 0).x;
+        codelines[i]->x = GetRandomValue(-5 * SCREEN_WIDTH, 0);
+        codelines[i]->y = GetRandomValue(0, SCREEN_HEIGHT);
         codelines[i]->good = false;
     }
-    printf("codelines init!\n");
 }
 
-void UpdateCodeLines(CodeLine *codelines, float delta)
+void UpdateCodeLines(Marks *marks, CodeLine *codelines[], float delta, Sound *good, Sound *bad)
 {
     for (int i = 0; i < MAXIMUM_CODELINES; i++) {
-        CodeLine *cur = codelines + i;
+        CodeLine *cur = codelines[i];
         cur->x += CODELINE_SPEED * delta;
-        DrawCodeLine(NULL, cur);
+        DrawCodeLine(marks, cur, good, bad);
     }
 }
 
-void DrawCodeLine(Marks *marks, CodeLine *codeline)
+void DrawCodeLine(Marks *marks, CodeLine *codeline, Sound *good, Sound *bad)
 {
-    float text_width = 
-        MeasureTextEx(GetFontDefault(), codeline->line, 1, 0).x;
+    DrawRectangle(codeline->x - 6, codeline->y, codeline->width + 12, 30, BLACK);
+    DrawTextEx(GetFontDefault(), codeline->line, 
+        (Vector2) {codeline->x, codeline->y}, 30, 0, GRAY);
+
+
+
+    BoundingBox codeline_bounds;
+    // codeline_bounds.min = (Vector3){codeline->x - 6, codeline->y, -100};
+    // codeline_bounds.max = (Vector3){codeline->x + codeline->width + 6, codeline->y + 30, 100};
+    // bool collision = CheckCollisionBoxSphere(codeline_bounds, 
+    //     (Vector3){marks->x, marks->y, 0}, marks->a)
+    bool collision = CheckCollisionRecs(
+        (Rectangle) {codeline->x - 6, codeline->y, codeline->width + 12, 30}, 
+        (Rectangle) {marks->x - marks->b->width / 2, marks->y - marks->b->height / 2, marks->b->width, marks->b->height});
+    if (collision && !codeline->good) {
+        PlaySound(*bad);
+        marks->health--;
+        codeline->x = 0;
+        codeline->y = SCREEN_WIDTH * -2;
+        mark_color = RED;
+    }
+    else if (collision && codeline->good) {
+        PlaySound(*good);
+        marks->health++;
+        codeline->x = 0;
+        codeline->y = SCREEN_WIDTH * -2;
+        mark_color = GREEN;
+    }
+
+    //CheckCollisionBoxSphere(BoundingBox box, Vector3 center, float radius);
+    //
+    // CheckCollisionBoxSphere()
 }
 
 void YouWin(Font *font)
 {
-    Music music_track = LoadMusicStream("win.mp3");
-    PlayMusicStream(music_track);
-    while (!WindowShouldClose())
+    Sound win = LoadSound("win.mp3");
+    PlaySound(win);
+    while (!WindowShouldClose() && GetCharPressed() == 0)
     {
-        UpdateMusicStream(music_track);
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawTextEx(*font, "YOU WIN!", 
@@ -341,17 +387,14 @@ void YouWin(Font *font)
                 SCREEN_HEIGHT / 2}, 100, 0, GREEN);
         EndDrawing();
     }
-    StopMusicStream(music_track);
-    UnloadMusicStream(music_track);
+    UnloadSound(win);
 }
 
 void YouLose(Font *font)
 {
-    Music music_track = LoadMusicStream("lose.mp3");
-    PlayMusicStream(music_track);
-    while (!WindowShouldClose())
-    {
-        UpdateMusicStream(music_track);
+    Sound lose = LoadSound("lose.mp3");
+    PlaySound(lose);
+    while(!WindowShouldClose() && GetCharPressed() == 0) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawTextEx(*font, "YOU LOSE!", 
@@ -362,6 +405,6 @@ void YouLose(Font *font)
             SCREEN_HEIGHT / 20}, 40, 0, RED);
         EndDrawing();
     }
-    StopMusicStream(music_track);
-    UnloadMusicStream(music_track);
+
+    UnloadSound(lose);
 }
