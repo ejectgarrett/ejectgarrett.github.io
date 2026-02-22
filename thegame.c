@@ -53,19 +53,22 @@ void YouLose(Font *font);
 
 Color DROP_SHADOW = (Color) {0, 0, 0, 100};
 
-int SCREEN_WIDTH = 1;
-int SCREEN_HEIGHT = 1;
+
+int SCREEN_WIDTH;
+int SCREEN_HEIGHT;
 
 int MARK_SPEED = 8;
 const int MAXIMUM_CODELINES = 15;
 
 int main() 
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Move Mark!");
-    ToggleBorderlessWindowed();
-    HideCursor();
+    InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Move Mark!");
+    SetWindowState(FLAG_FULLSCREEN_MODE);
     SCREEN_WIDTH = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
+    ToggleBorderlessWindowed();
+    HideCursor();
+    printf("Width: %d, Height: %d\n", SCREEN_WIDTH, SCREEN_HEIGHT);
     Font comicsans = LoadFont("comicsans.ttf");
     Image mark = LoadImage("mark.png");
     Image redmark = LoadImage("redmark.png");
@@ -257,12 +260,13 @@ void GameLoop(Marks *marks, Font *font)
         if (GetTime() < 40)
         {
             DrawTextEx(*font, game_message, 
-            (Vector2) {SCREEN_WIDTH / 2 - (MeasureText(game_message, 30) / 2), 
+            (Vector2) {SCREEN_WIDTH / 2 - (MeasureText(game_message, 30) / 2),
             SCREEN_HEIGHT / 20}, 30, 0, BLACK);
         }
 
         if (marks->health >= 0)
-            DrawTextEx(*font, TextFormat("HEALTH = %d", marks->health), (Vector2) {SCREEN_WIDTH - SCREEN_WIDTH / 8, 
+            DrawTextEx(*font, TextFormat("HEALTH = %d", marks->health), 
+            (Vector2) {SCREEN_WIDTH - SCREEN_WIDTH / 8, 
             SCREEN_HEIGHT / 20}, 40, 0, BLACK);
             
 
@@ -292,34 +296,44 @@ void UpdateCodeLines(CodeLine *codelines, float delta)
 void DrawCodeLine(Marks *marks, CodeLine *codeline)
 {
     float text_width = 
-        MeasureTextEx(GetFontDefault(), codeline->line, 30, 0).x;
-    DrawTextEx(GetFontDefault(), "", {}, 30, 0, GRAY); // will add box later
+        MeasureTextEx(GetFontDefault(), *codeline->line, 1, 0).x;
 }
 
 void YouWin(Font *font)
 {
+    Music music_track = LoadMusicStream("win.mp3");
+    PlayMusicStream(music_track);
     while (!WindowShouldClose())
     {
+        UpdateMusicStream(music_track);
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawTextEx(*font, "YOU WIN!", 
-            (Vector2) {SCREEN_WIDTH / 2 - (MeasureText("YOU WIN!", 100) / 2), 
-            SCREEN_HEIGHT / 2}, 100, 0, GREEN);
+                (Vector2) {SCREEN_WIDTH / 2 - (MeasureText("YOU WIN!", 100) / 2),
+                SCREEN_HEIGHT / 2}, 100, 0, GREEN);
         EndDrawing();
     }
+    StopMusicStream(music_track);
+    UnloadMusicStream(music_track);
 }
 
 void YouLose(Font *font)
 {
+    Music music_track = LoadMusicStream("lose.mp3");
+    PlayMusicStream(music_track);
     while (!WindowShouldClose())
     {
+        UpdateMusicStream(music_track);
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawTextEx(*font, "YOU LOSE!", 
             (Vector2) {SCREEN_WIDTH / 2 - (MeasureText("YOU LOSE!", 100) / 2), 
             SCREEN_HEIGHT / 2}, 100, 0, RED);
-        DrawTextEx(*font, "HEALTH = NULL", (Vector2) {SCREEN_WIDTH - SCREEN_WIDTH / 8, 
+        DrawTextEx(*font, "HEALTH = NULL", (Vector2) 
+            {SCREEN_WIDTH - SCREEN_WIDTH / 8, 
             SCREEN_HEIGHT / 20}, 40, 0, RED);
         EndDrawing();
     }
+    StopMusicStream(music_track);
+    UnloadMusicStream(music_track);
 }

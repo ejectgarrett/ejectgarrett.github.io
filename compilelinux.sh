@@ -1,0 +1,1 @@
+gcc -Wall -Wextra -o thegame thegame.c -lraylib -lm
