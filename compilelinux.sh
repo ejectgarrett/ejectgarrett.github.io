@@ -1,1 +1,1 @@
-gcc -Wall -Wextra -o thegame thegame.c -lraylib -lm
+gcc -Wall -Wextra -o badmarks thegame.c -lraylib -lm

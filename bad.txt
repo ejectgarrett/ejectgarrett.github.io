@@ -1,7 +1,0 @@
-int string = 5;
-if (true) printf("doogle") }
-string bob = 5.5;
-char c = "d";
-string int = "bobert";
-string name = "barry;
-float 5 = 5.0;
