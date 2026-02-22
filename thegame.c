@@ -163,10 +163,10 @@ void TakeMovementInput(Marks *marks, float delta)
     marks->x_multiplier = 0;
     marks->y_multiplier = 0;
 
-    if (IsKeyDown(KEY_RIGHT)) marks->x_multiplier++;
-    if (IsKeyDown(KEY_LEFT)) marks->x_multiplier--;
-    if (IsKeyDown(KEY_UP)) marks->y_multiplier--;
-    if (IsKeyDown(KEY_DOWN)) marks->y_multiplier++;
+    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) marks->x_multiplier++;
+    if (IsKeyDown(KEY_LEFT)  || IsKeyDown(KEY_A)) marks->x_multiplier--;
+    if (IsKeyDown(KEY_UP)  || IsKeyDown(KEY_W)) marks->y_multiplier--;
+    if (IsKeyDown(KEY_DOWN)  || IsKeyDown(KEY_S)) marks->y_multiplier++;
 
     // normalize vector
     float magnitude = 
@@ -194,9 +194,7 @@ void DrawMark(Marks *marks, bool red)
     if (red)
         curr_mark = marks->b;
     else
-
-
-            curr_mark = marks->a;
+        curr_mark = marks->a;
     
     Rectangle source = {0, 0, marks->a->width, marks->a->height};
     Rectangle destination = {marks->x, marks->y, marks->a->width, curr_mark->height};
@@ -343,8 +341,6 @@ void DrawCodeLine(Marks *marks, CodeLine *codeline, Sound *good, Sound *bad)
     DrawRectangle(codeline->x - 6, codeline->y, codeline->width + 12, 30, BLACK);
     DrawTextEx(GetFontDefault(), codeline->line, 
         (Vector2) {codeline->x, codeline->y}, 30, 0, GRAY);
-
-
 
     BoundingBox codeline_bounds;
     // codeline_bounds.min = (Vector3){codeline->x - 6, codeline->y, -100};
