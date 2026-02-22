@@ -8,9 +8,10 @@
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAXIMUM_CODELINES 15
 
 typedef struct {Texture2D *a, *b; int x, y, health; float x_multiplier, y_multiplier;} Marks;
-typedef struct {char **line; int size, x, y; bool good;} CodeLine;
+typedef struct {char *line; int size, x, y; bool good;} CodeLine;
 
 const char *lines[5] = {
     "Welcome my friend!", 
@@ -20,7 +21,7 @@ const char *lines[5] = {
     "No assignments. No autograders. No debugging. Just pure low-level programming bliss."
 };
 
-const char *good_lines[7] = {
+char *good_lines[MAXIMUM_CODELINES / 2] = {
     "int i = 5;",
     "if (5 < 7) { printf(\"splendid\"); }",
     "char *goobert = \"goobert\";",
@@ -29,7 +30,7 @@ const char *good_lines[7] = {
     "int _string = 60;",
     "int gooberts_money = 5;"
 };
-const char *bad_lines[7] = {
+char *bad_lines[MAXIMUM_CODELINES / 2] = {
     "int string = 5;",
     "if (true) printf(\"doogle\") }",
     "string bob = 5.5;",
@@ -42,6 +43,7 @@ const char *bad_lines[7] = {
 void TakeMovementInput(Marks *marks, float delta);
 float Clamp(float v, float _min, float _max);
 float Lerp(float a, float b, float interp);
+void InitCodelines(CodeLine *codelines[]);
 void UpdateCodeLines(CodeLine *codelines, float delta);
 void SpawnCodeLine(CodeLine *codelines);
 void DrawCodeLine(Marks *marks, CodeLine *codeline);
@@ -58,7 +60,7 @@ int SCREEN_WIDTH;
 int SCREEN_HEIGHT;
 
 int MARK_SPEED = 8;
-const int MAXIMUM_CODELINES = 15;
+
 
 int main() 
 {
@@ -123,7 +125,6 @@ int main()
         DrawMark(&marks, false);
         if (IsKeyPressed(KEY_ENTER)) {
             i++;
-            i %= 5;
             time_since_last = 0;
         }
         DrawDialogue(&comicsans, i, &marks, time_since_last);
@@ -132,7 +133,7 @@ int main()
                 SCREEN_HEIGHT - SCREEN_HEIGHT / 20}, 30, 0, BLACK);
         DrawFPS(10, 20);
         EndDrawing();
-        if (GetTime() >= 10)
+        if (i > 4)
         {
             StopMusicStream(music_track);
             UnloadMusicStream(music_track);
@@ -235,7 +236,11 @@ void DrawDialogue(Font *font, int i, Marks *marks, float time_since_last)
 void GameLoop(Marks *marks, Font *font)
 {
     float delta = 0.0;
-    CodeLine codelines[MAXIMUM_CODELINES];
+    CodeLine *codelines[MAXIMUM_CODELINES];
+    for (int i = 0; i < MAXIMUM_CODELINES; i++) {
+        codelines[i] = (CodeLine *)malloc(sizeof(CodeLine));
+    }
+    InitCodelines(codelines);
     Music music_track = LoadMusicStream("music.mp3");
     PlayMusicStream(music_track);
     const char *game_message = "Defend Mark from the invalid syntaxes!\n         Don't let his health go NULL.";
@@ -284,6 +289,29 @@ void GameLoop(Marks *marks, Font *font)
 
 }
 int CODELINE_SPEED = 7;
+
+void InitCodelines(CodeLine *codelines[])
+{
+    for (int i = 0; i < MAXIMUM_CODELINES / 2; i++) {
+        printf("%s\n", good_lines[i]);
+        codelines[i]->line = good_lines[i];
+        codelines[i]->size = strlen(good_lines[i]);
+        codelines[i]->x = 0;
+        codelines[i]->y = 0;
+        codelines[i]->good = true;
+        printf("%s\n", good_lines[i]);
+    }
+
+    for (int i = MAXIMUM_CODELINES / 2; i < MAXIMUM_CODELINES - 1; i++) {
+        codelines[i]->line = bad_lines[i - (MAXIMUM_CODELINES / 2)];
+        codelines[i]->size = strlen(bad_lines[i - (MAXIMUM_CODELINES / 2)]);
+        codelines[i]->x = 0;
+        codelines[i]->y = 0;
+        codelines[i]->good = false;
+    }
+    printf("codelines init!\n");
+}
+
 void UpdateCodeLines(CodeLine *codelines, float delta)
 {
     for (int i = 0; i < MAXIMUM_CODELINES; i++) {
@@ -296,7 +324,7 @@ void UpdateCodeLines(CodeLine *codelines, float delta)
 void DrawCodeLine(Marks *marks, CodeLine *codeline)
 {
     float text_width = 
-        MeasureTextEx(GetFontDefault(), *codeline->line, 1, 0).x;
+        MeasureTextEx(GetFontDefault(), codeline->line, 1, 0).x;
 }
 
 void YouWin(Font *font)
