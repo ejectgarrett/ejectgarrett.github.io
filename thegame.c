@@ -292,7 +292,8 @@ void UpdateCodeLines(CodeLine *codelines, float delta)
 void DrawCodeLine(Marks *marks, CodeLine *codeline)
 {
     float text_width = 
-        MeasureTextEx(GetFontDefault(), codeline->line, , 0).x;
+        MeasureTextEx(GetFontDefault(), codeline->line, 30, 0).x;
+    DrawTextEx(GetFontDefault(), "", {}, 30, 0, GRAY); // will add box later
 }
 
 void YouWin(Font *font)
